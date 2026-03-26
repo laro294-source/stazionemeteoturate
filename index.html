@@ -134,7 +134,7 @@ function im(i){return(i*25.4).toFixed(1)}
 function hp(i){return(i*33.8639).toFixed(1)}
 var WD=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
 function dd(d){return WD[Math.round(d/22.5)%16]}
-function bf(k){k=parseFloat(k);if(k<1)return"Calma";if(k<6)return"1 Bft";if(k<12)return"2 Bft";if(k<20)return"3 Bft";if(k<29)return"4 Bft";if(k<39)return"5 Bft";if(k<50)return"6 Bft";return"7+ Bft"}
+function bf(k){k=parseFloat(k);if(k<1)return"0 Bft - Calma";if(k<6)return"1 Bft - Bava di vento";if(k<12)return"2 Bft - Brezza leggera";if(k<20)return"3 Bft - Brezza tesa";if(k<29)return"4 Bft - Vento moderato";if(k<39)return"5 Bft - Vento teso";if(k<50)return"6 Bft - Vento fresco";if(k<62)return"7 Bft - Vento forte";return"8+ Bft - Burrasca"}
 function td(c){var t=parseFloat(c);if(t<0)return"Gelido";if(t<5)return"Molto freddo";if(t<10)return"Freddo";if(t<15)return"Fresco";if(t<20)return"Mite";if(t<25)return"Gradevole";if(t<30)return"Caldo";return"Molto caldo"}
 function sv(v,u,fn){if(v==null||v===undefined)return"-";return(fn?fn(v):v)+(u||"")}
 function r4(a,b,c,d,e,f){return"<tr><td class=k>"+a+"</td><td class="+(c||"v")+">"+b+"</td><td class=k>"+d+"</td><td class="+(f||"v")+">"+e+"</td></tr>"}
