@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meteo Turate</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#e8f0f0;background-image:url("https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=1920&q=80");background-size:cover;background-attachment:fixed;background-position:center;font-family:Calibri,"Segoe UI",Arial,sans-serif;color:#333;font-size:13px;min-height:100vh}
+.hdr{background:linear-gradient(180deg,rgba(26,138,138,.92),rgba(14,104,104,.92));border-bottom:2px solid #20a0a0;padding:10px 14px}
+.hdr h1{font-size:19px;color:#fff}
+.hdr .loc{font-size:11px;color:#b0e8e8;margin-top:1px}
+.hdr .tsl{margin-top:6px;font-size:13px;color:#d0f0d8}
+.hdr .bt{font-size:30px;font-weight:700;color:#fff;margin-left:20px;vertical-align:middle}
+.hdr .tr{font-size:13px;color:#a0d8b0;margin-left:6px}
+.wrap{max-width:980px;margin:0 auto;padding:0 6px 10px}
+.nav{background:rgba(240,242,245,.85);border:1px solid #d0d5dd;padding:4px;margin:8px 0;display:flex;flex-wrap:wrap;gap:3px}
+.nav button{padding:5px 12px;background:rgba(255,255,255,.8);border:1px solid #d0d5dd;color:#1a6aaa;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;text-transform:uppercase}
+.nav button.on{background:#1a6aaa;color:#fff;border-color:#1a6aaa}
+.tb{display:inline-block;padding:4px 12px;margin:0 4px 8px 0;background:rgba(255,255,255,.8);border:1px solid #d0d5dd;color:#1a6aaa;font-size:11px;cursor:pointer;font-family:inherit}
+.tb.red{color:#cc3322;border-color:#e0b0a8}
+.sh{background:linear-gradient(90deg,rgba(32,112,184,.92),rgba(26,90,152,.92));border:1px solid #2880c8;border-bottom:none;padding:4px 8px;color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+.dt{width:100%;border-collapse:collapse;background:rgba(255,255,255,.88);border:1px solid #d0d5dd}
+.dt td{padding:5px 8px;border:1px solid #e4e8ee;vertical-align:top}
+.dt .k{color:#778899;font-size:11px}
+.dt .v{color:#1a8a40;font-size:15px;font-weight:700}
+.dt .vb{color:#1a7abc;font-size:15px;font-weight:700}
+.dt .vo{color:#cc7a18;font-size:15px;font-weight:700}
+.dt .vr{color:#cc3322;font-size:15px;font-weight:700}
+.dt .vp{color:#8858a8;font-size:15px;font-weight:700}
+.dt .vy{color:#9a8818;font-size:15px;font-weight:700}
+.dt .vw{color:#444;font-size:15px;font-weight:700}
+.dt .sm{color:#778899;font-size:10px;font-weight:400}
+.cw{background:rgba(255,255,255,.88);border:1px solid #d0d5dd;border-top:none;padding:8px}
+.cb{position:relative;width:100%;height:210px}
+.pg{display:none}.pg.on{display:block}
+#LP{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.lc{background:rgba(255,255,255,.9);border:1px solid rgba(208,213,221,.7);padding:28px;max-width:370px;width:100%;border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.lc h1{color:#1a5a32;font-size:17px;text-align:center}
+.lc .su{text-align:center;color:#889098;font-size:11px;margin:3px 0 18px}
+.lc label{display:block;font-size:10px;color:#778899;letter-spacing:1px;font-weight:700;margin:10px 0 3px}
+.lc input{width:100%;padding:9px;background:#f8f9fb;border:1px solid #d0d5dd;color:#333;font-size:13px;font-family:Calibri,sans-serif;outline:none}
+.lb{width:100%;margin-top:18px;padding:11px;background:#1a6aaa;border:1px solid #1a6aaa;color:#fff;font-weight:700;font-size:12px;letter-spacing:1.5px;cursor:pointer;font-family:inherit;border-radius:3px}
+.lb:disabled{opacity:.4;cursor:wait}
+.er{color:#cc3322;font-size:11px;margin-top:6px;display:none}
+.ft{text-align:center;font-size:10px;color:rgba(255,255,255,.7);padding:14px 8px;margin-top:10px;border-top:1px solid rgba(255,255,255,.2)}
+.fc-row{display:flex;gap:4px;overflow-x:auto;padding:8px 0}
+.fc-day{background:rgba(255,255,255,.88);border:1px solid #d0d5dd;border-radius:4px;padding:8px;min-width:90px;text-align:center;flex-shrink:0}
+.fc-day .fd{font-size:11px;font-weight:700;color:#1a6aaa}
+.fc-day .fi{font-size:22px;margin:4px 0}
+.fc-day .ft2{font-size:13px;font-weight:700}
+.fc-day .ft2 .hi{color:#cc3322}
+.fc-day .ft2 .lo{color:#1a7abc}
+.fc-day .fp{font-size:10px;color:#778899;margin-top:2px}
+</style>
+</head>
+<body>
+
+<div id="LP">
+<div class="lc">
+<h1>Meteo Turate</h1>
+<p class="su">AMBIENT WEATHER WS-2902D</p>
+<label>API KEY</label>
+<input type="text" id="iA">
+<label>APPLICATION KEY</label>
+<input type="text" id="iB">
+<p class="er" id="eM"></p>
+<button class="lb" id="bG">CONNETTI</button>
+</div>
+</div>
+
+<div id="DP" style="display:none">
+<div class="hdr">
+<h1 id="hN">Meteo Turate</h1>
+<div class="loc">Turate (CO), Lombardia</div>
+<div class="tsl">Dati: <span id="hT"></span> <span class="bt" id="hC"></span> <span class="tr" id="hD"></span> <span style="font-size:10px;color:rgba(255,255,255,.5);margin-left:10px" id="aL"></span></div>
+</div>
+<div class="wrap">
+<div class="nav"><button class="on">Condizioni Attuali</button><button>Grafici 24h</button><button>Grafici 7 Giorni</button></div>
+<span class="tb" id="bR">Aggiorna</span>
+<span class="tb red" id="bO">Esci</span>
+
+<div class="pg on" id="P0">
+<div class="sh">Summary / Temperatura</div>
+<table class="dt" id="T1"></table>
+<div class="sh">Estremi Oggi</div>
+<table class="dt" id="TE"><tr><td class="k" colspan="4" style="text-align:center">In attesa dati...</td></tr></table>
+<div class="sh">Vento</div>
+<table class="dt" id="T2"></table>
+<div class="sh">Pioggia</div>
+<table class="dt" id="T3"></table>
+<div class="sh">Barometro</div>
+<table class="dt" id="T4"></table>
+<div class="sh">Solare / UV</div>
+<table class="dt" id="T5"></table>
+<div class="sh">Sensore Interno</div>
+<table class="dt" id="T6"></table>
+<div class="sh">Previsioni 7 Giorni (Open-Meteo)</div>
+<div id="FC"><div class="fc-row" style="justify-content:center;color:#778899">Caricamento previsioni...</div></div>
+</div>
+
+<div class="pg" id="P1">
+<div class="sh">Temperatura 24h</div><div class="cw"><div class="cb"><canvas id="g1"></canvas></div></div>
+<div class="sh">Umidita 24h</div><div class="cw"><div class="cb"><canvas id="g2"></canvas></div></div>
+<div class="sh">Vento 24h</div><div class="cw"><div class="cb"><canvas id="g3"></canvas></div></div>
+<div class="sh">Pioggia 24h</div><div class="cw"><div class="cb"><canvas id="g4"></canvas></div></div>
+<div class="sh">Pressione 24h</div><div class="cw"><div class="cb"><canvas id="g5"></canvas></div></div>
+</div>
+
+<div class="pg" id="P2">
+<div id="L7" class="sh" style="text-align:center;padding:18px;color:#cc7a18">Caricamento 7 giorni...</div>
+<div id="W7" style="display:none">
+<div class="sh">Temp Min/Max 7gg</div><div class="cw"><div class="cb"><canvas id="g6"></canvas></div></div>
+<div class="sh">Pioggia 7gg</div><div class="cw"><div class="cb"><canvas id="g7"></canvas></div></div>
+<div class="sh">Umidita 7gg</div><div class="cw"><div class="cb"><canvas id="g8"></canvas></div></div>
+<div class="sh">Vento 7gg</div><div class="cw"><div class="cb"><canvas id="g9"></canvas></div></div>
+</div>
+</div>
+
+<div class="ft">Non prendere mai decisioni importanti sulla base di questo o altri servizi meteo da internet.</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+var CK="fe23970f7c0b47b6a5abf9d69c1ed2943b83e00b003e466c99de9b94b5592c14";
+var AK="c9f08f9554d8408f94e1ce82a7b667e29e2b6e9ba5ef42fbb17197d73298fa6f";
+var U="https://rt.ambientweather.net/v1/devices";
+var S={ak:"",apk:"",mac:"",d24:null,d7d:null,tab:0,ci:{}};
+
+function fc(f){return((f-32)*5/9).toFixed(1)}
+function mk(m){return(m*1.60934).toFixed(1)}
+function im(i){return(i*25.4).toFixed(1)}
+function hp(i){return(i*33.8639).toFixed(1)}
+var WD=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+function dd(d){return WD[Math.round(d/22.5)%16]}
+function bf(k){k=parseFloat(k);if(k<1)return"Calma";if(k<6)return"1 Bft";if(k<12)return"2 Bft";if(k<20)return"3 Bft";if(k<29)return"4 Bft";if(k<39)return"5 Bft";if(k<50)return"6 Bft";return"7+ Bft"}
+function td(c){var t=parseFloat(c);if(t<0)return"Gelido";if(t<5)return"Molto freddo";if(t<10)return"Freddo";if(t<15)return"Fresco";if(t<20)return"Mite";if(t<25)return"Gradevole";if(t<30)return"Caldo";return"Molto caldo"}
+function sv(v,u,fn){if(v==null||v===undefined)return"-";return(fn?fn(v):v)+(u||"")}
+function r4(a,b,c,d,e,f){return"<tr><td class=k>"+a+"</td><td class="+(c||"v")+">"+b+"</td><td class=k>"+d+"</td><td class="+(f||"v")+">"+e+"</td></tr>"}
+function hm(ts){var d=new Date(ts);return("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
+function ag(url){return fetch(url).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+function sl(t){return new Promise(function(r){setTimeout(r,t)})}
+
+function doC(){
+var a=document.getElementById("iA").value.trim(),b=document.getElementById("iB").value.trim();
+var er=document.getElementById("eM"),bt=document.getElementById("bG");
+if(!a||!b){er.textContent="Inserisci entrambe le chiavi.";er.style.display="block";return}
+bt.disabled=true;bt.textContent="CONNESSIONE...";er.style.display="none";
+ag(U+"?apiKey="+a+"&applicationKey="+b).then(function(ds){
+if(!ds||!ds.length)throw new Error("Nessun dispositivo.");
+var d=ds[0];S.ak=a;S.apk=b;S.mac=d.macAddress;
+try{localStorage.setItem("wa",a);localStorage.setItem("wb",b)}catch(x){}
+document.getElementById("hN").textContent="Meteo Turate";
+document.getElementById("LP").style.display="none";
+document.getElementById("DP").style.display="block";
+rC(d.lastData);sA();loadFC();
+return ag(U+"/"+d.macAddress+"?apiKey="+a+"&applicationKey="+b+"&limit=288")
+}).then(function(h){
+S.d24=h.slice().reverse();rE();
+f7(0,[])
+}).catch(function(e){
+er.textContent=e.message;er.style.display="block";bt.disabled=false;bt.textContent="CONNETTI"
+})}
+
+function f7(i,all){
+if(i>=8){fin7(all);return}
+var ed=all.length?all[all.length-1].dateutc:undefined;
+var cut=Date.now()-7*864e5;
+var url=U+"/"+S.mac+"?apiKey="+S.ak+"&applicationKey="+S.apk+"&limit=288";
+if(ed)url+="&endDate="+ed;
+sl(1500).then(function(){return ag(url)}).then(function(b){
+if(!b||!b.length){fin7(all);return}
+all=all.concat(b);
+var o=b[b.length-1];
+if(!o||!o.dateutc||o.dateutc<cut){fin7(all);return}
+f7(i+1,all)
+}).catch(function(){fin7(all)})}
+
+function fin7(all){
+var seen={},u=[];
+for(var i=0;i<all.length;i++){if(!seen[all[i].dateutc]){seen[all[i].dateutc]=1;u.push(all[i])}}
+u.sort(function(a,b){return a.dateutc-b.dateutc});
+S.d7d=aD(u);
+document.getElementById("L7").style.display="none";
+document.getElementById("W7").style.display="block"}
+
+function doR(){
+var b=document.getElementById("bR");b.textContent="...";
+ag(U+"?apiKey="+S.ak+"&applicationKey="+S.apk).then(function(ds){
+if(ds&&ds[0]&&ds[0].lastData)rC(ds[0].lastData);
+return ag(U+"/"+S.mac+"?apiKey="+S.ak+"&applicationKey="+S.apk+"&limit=288")
+}).then(function(h){S.d24=h.slice().reverse();rE();if(S.tab===1)d24()
+}).catch(function(){}).finally(function(){b.textContent="Aggiorna"})}
+
+var aT,cT,cd=60;
+function aR(){if(!S.mac)return;var l=document.getElementById("aL");l.textContent="aggiorno...";l.style.color="#fff";
+ag(U+"?apiKey="+S.ak+"&applicationKey="+S.apk).then(function(ds){if(ds&&ds[0]&&ds[0].lastData)rC(ds[0].lastData)}).catch(function(){}).finally(function(){cd=60;setTimeout(function(){l.style.color="rgba(255,255,255,.5)"},800)})}
+function uC(){if(cd>0)cd--;document.getElementById("aL").textContent="auto "+cd+"s"}
+function sA(){clearInterval(aT);clearInterval(cT);cd=60;aT=setInterval(aR,60000);cT=setInterval(uC,1000)}
+
+function gT(i){
+S.tab=i;
+for(var j=0;j<3;j++){document.getElementById("P"+j).className=j===i?"pg on":"pg";document.querySelectorAll(".nav button")[j].className=j===i?"on":""}
+if(i===1&&S.d24)setTimeout(d24,300);
+if(i===2&&S.d7d)setTimeout(d7,300)}
+
+function rC(d){
+var t=fc(d.tempf),w=mk(d.windspeedmph),g=mk(d.windgustmph),wd=dd(d.winddir);
+document.getElementById("hT").textContent=new Date(d.dateutc).toLocaleString("it-IT");
+document.getElementById("hC").textContent=t+"\u00B0C";
+document.getElementById("hD").textContent=td(t);
+document.getElementById("T1").innerHTML=r4("Temperatura",t+"\u00B0C","v","Percepita",sv(d.feelsLike,"\u00B0C",fc),"vb")+r4("Dew Point",sv(d.dewPoint,"\u00B0C",fc),"vb","Condizione",td(t),"vw");
+document.getElementById("T2").innerHTML=r4("Direzione",wd+" ("+d.winddir+"\u00B0)","v","Velocita",w+" km/h","v")+r4("Raffica",g+" km/h","vo","Beaufort",bf(w),"vw")+r4("Raff.Max",sv(d.maxdailygust," km/h",mk),"vr","","","k");
+document.getElementById("T3").innerHTML=r4("Pioggia oggi",im(d.dailyrainin)+" mm","v","Rain Rate",sv(d.hourlyrainin," mm/h",im),"vo")+r4("Settimana",im(d.weeklyrainin)+" mm","vb","Mese",im(d.monthlyrainin)+" mm","vb")+r4("Totale",im(d.totalrainin||0)+" mm","vb","Evento",sv(d.eventrainin," mm",im),"v");
+document.getElementById("T4").innerHTML=r4("Umidita",d.humidity+"%",d.humidity>80?"vr":"v","Dew Point",sv(d.dewPoint,"\u00B0C",fc),"vb")+r4("Press.Rel.",hp(d.baromrelin)+" hPa","vp","Press.Abs.",hp(d.baromabsin)+" hPa","vp");
+document.getElementById("T5").innerHTML=r4("Radiazione",(d.solarradiation!=null?d.solarradiation:"-")+" W/m\u00B2","vy","UV",(d.uv!=null?d.uv:"-"),"vo");
+document.getElementById("T6").innerHTML=r4("Temp.int.",fc(d.tempinf)+"\u00B0C","vo","Umid.int.",(d.humidityin!=null?d.humidityin:"-")+"%","v")}
+
+function rE(){
+if(!S.d24||!S.d24.length)return;
+var n=new Date();
+var dy=n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)+"-"+("0"+n.getDate()).slice(-2);
+var tMin=999,tMax=-999,hMin=999,hMax=-999;
+var tMinTs=0,tMaxTs=0,hMinTs=0,hMaxTs=0;
+var found=false;
+for(var i=0;i<S.d24.length;i++){
+var d=S.d24[i],dt=new Date(d.dateutc);
+var dk=dt.getFullYear()+"-"+("0"+(dt.getMonth()+1)).slice(-2)+"-"+("0"+dt.getDate()).slice(-2);
+if(dk!==dy)continue;
+found=true;
+if(d.tempf!=null){var tc=parseFloat(fc(d.tempf));if(tc<tMin){tMin=tc;tMinTs=d.dateutc}if(tc>tMax){tMax=tc;tMaxTs=d.dateutc}}
+if(d.humidity!=null){if(d.humidity<hMin){hMin=d.humidity;hMinTs=d.dateutc}if(d.humidity>hMax){hMax=d.humidity;hMaxTs=d.dateutc}}}
+if(!found){for(var j=0;j<S.d24.length;j++){var d2=S.d24[j];
+if(d2.tempf!=null){var tc2=parseFloat(fc(d2.tempf));if(tc2<tMin){tMin=tc2;tMinTs=d2.dateutc}if(tc2>tMax){tMax=tc2;tMaxTs=d2.dateutc}}
+if(d2.humidity!=null){if(d2.humidity<hMin){hMin=d2.humidity;hMinTs=d2.dateutc}if(d2.humidity>hMax){hMax=d2.humidity;hMaxTs=d2.dateutc}}}}
+if(tMin>900)return;
+document.getElementById("TE").innerHTML=
+r4("Temp Min",tMin.toFixed(1)+"\u00B0C <span class=sm>alle "+hm(tMinTs)+"</span>","vb","Temp Max",tMax.toFixed(1)+"\u00B0C <span class=sm>alle "+hm(tMaxTs)+"</span>","vr")
++r4("Umid Min",(hMin<900?hMin:"-")+"% <span class=sm>alle "+hm(hMinTs)+"</span>","vb","Umid Max",(hMax>-900?hMax:"-")+"% <span class=sm>alle "+hm(hMaxTs)+"</span>","vr")}
+
+/* === PREVISIONI OPEN-METEO === */
+var WMO={"0":"\u2600\uFE0F","1":"\uD83C\uDF24","2":"\u26C5","3":"\u2601\uFE0F","45":"\uD83C\uDF2B","48":"\uD83C\uDF2B","51":"\uD83C\uDF26","53":"\uD83C\uDF26","55":"\uD83C\uDF27","56":"\uD83C\uDF28","57":"\uD83C\uDF28","61":"\uD83C\uDF27","63":"\uD83C\uDF27","65":"\uD83C\uDF27\uFE0F","66":"\uD83C\uDF28","67":"\uD83C\uDF28","71":"\uD83C\uDF28","73":"\uD83C\uDF28","75":"\u2744\uFE0F","77":"\u2744\uFE0F","80":"\uD83C\uDF26","81":"\uD83C\uDF27","82":"\u26C8","85":"\uD83C\uDF28","86":"\uD83C\uDF28","95":"\u26C8","96":"\u26C8","99":"\u26C8"};
+var WDESC={"0":"Sereno","1":"Prev. sereno","2":"Parz. nuvoloso","3":"Coperto","45":"Nebbia","48":"Nebbia gelata","51":"Pioggerella","53":"Pioggerella","55":"Pioggerella forte","61":"Pioggia leggera","63":"Pioggia moderata","65":"Pioggia forte","66":"Pioggia gelata","67":"Pioggia gelata forte","71":"Neve leggera","73":"Neve moderata","75":"Neve forte","77":"Granuli neve","80":"Rovescio legg.","81":"Rovescio mod.","82":"Rovescio forte","85":"Neve a rovesci","86":"Neve forte rov.","95":"Temporale","96":"Temp. grandine","99":"Temp. grandine forte"};
+
+function loadFC(){
+var url="https://api.open-meteo.com/v1/forecast?latitude=45.65&longitude=9.00&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=Europe/Rome";
+fetch(url).then(function(r){return r.json()}).then(function(data){
+var d=data.daily;
+var html='<div class="fc-row">';
+var giorni=["Dom","Lun","Mar","Mer","Gio","Ven","Sab"];
+for(var i=0;i<7;i++){
+var dt=new Date(d.time[i]+"T12:00:00");
+var gn=giorni[dt.getDay()];
+var dd2=("0"+dt.getDate()).slice(-2)+"/"+("0"+(dt.getMonth()+1)).slice(-2);
+var wc=String(d.weathercode[i]);
+var icon=WMO[wc]||"\u2601\uFE0F";
+var desc=WDESC[wc]||"";
+html+='<div class="fc-day">';
+html+='<div class="fd">'+gn+" "+dd2+"</div>";
+html+='<div class="fi">'+icon+"</div>";
+html+='<div class="ft2"><span class="hi">'+d.temperature_2m_max[i]+"\u00B0</span> / <span class=\"lo\">"+d.temperature_2m_min[i]+"\u00B0</span></div>";
+html+='<div class="fp">'+desc+'</div>';
+html+='<div class="fp">'+d.precipitation_sum[i]+' mm</div>';
+html+='<div class="fp">Vento '+d.windspeed_10m_max[i]+' km/h</div>';
+html+="</div>"}
+html+="</div>";
+document.getElementById("FC").innerHTML=html
+}).catch(function(){document.getElementById("FC").innerHTML='<div style="text-align:center;color:#778899;padding:8px">Previsioni non disponibili</div>'})}
+
+function nC(id){var o=document.getElementById(id);var p=o.parentNode;var n=document.createElement("canvas");n.id=id;p.replaceChild(n,o);return n}
+
+function d24(){
+if(typeof Chart==="undefined"||!S.d24)return;
+for(var k in S.ci){try{S.ci[k].destroy()}catch(e){}}S.ci={};
+var dt=S.d24,lb=[],t=[],h=[],w=[],gu=[],ra=[],pr=[];
+for(var i=0;i<dt.length;i++){var d=dt[i],x=new Date(d.dateutc);
+lb.push(("0"+x.getHours()).slice(-2)+":"+("0"+x.getMinutes()).slice(-2));
+t.push(d.tempf!=null?parseFloat(fc(d.tempf)):null);
+h.push(d.humidity!=null?d.humidity:null);
+w.push(d.windspeedmph!=null?parseFloat(mk(d.windspeedmph)):null);
+gu.push(d.windgustmph!=null?parseFloat(mk(d.windgustmph)):null);
+ra.push(d.hourlyrainin!=null?parseFloat(im(d.hourlyrainin)):null);
+pr.push(d.baromrelin!=null?parseFloat(hp(d.baromrelin)):null)}
+var sk=dt.length>80?Math.floor(dt.length/40):1;
+var tl=lb.map(function(l,i){return i%sk===0?l:""});
+var lo={responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{maxTicksLimit:12}}},elements:{point:{radius:0},line:{tension:.3}},plugins:{tooltip:{mode:"index",intersect:false},legend:{display:false}}};
+Chart.defaults.color="#778899";Chart.defaults.borderColor="rgba(200,200,200,.5)";Chart.defaults.font.family="Calibri";Chart.defaults.font.size=10;Chart.defaults.animation.duration=300;
+S.ci.a=new Chart(nC("g1"),{type:"line",data:{labels:tl,datasets:[{data:t,borderColor:"#1a8a40",borderWidth:2,fill:false}]},options:lo});
+var lo2=JSON.parse(JSON.stringify(lo));lo2.scales.y={min:0,max:100};
+S.ci.b=new Chart(nC("g2"),{type:"line",data:{labels:tl,datasets:[{data:h,borderColor:"#1a7abc",borderWidth:2,fill:false}]},options:lo2});
+var lo3=JSON.parse(JSON.stringify(lo));lo3.plugins.legend={display:true,labels:{color:"#778899"}};
+S.ci.c=new Chart(nC("g3"),{type:"line",data:{labels:tl,datasets:[{data:w,borderColor:"#1a8a40",borderWidth:2,label:"Vento"},{data:gu,borderColor:"#cc7a18",borderWidth:1,borderDash:[4,2],label:"Raffica"}]},options:lo3});
+S.ci.d=new Chart(nC("g4"),{type:"bar",data:{labels:tl,datasets:[{data:ra,backgroundColor:"#3088cc",borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{maxTicksLimit:12}}},plugins:{legend:{display:false}}}});
+S.ci.e=new Chart(nC("g5"),{type:"line",data:{labels:tl,datasets:[{data:pr,borderColor:"#8858a8",borderWidth:2,fill:false}]},options:lo})}
+
+function aD(data){
+var days={};
+for(var i=0;i<data.length;i++){var d=data[i],dt=new Date(d.dateutc);
+var k=dt.getFullYear()+"-"+("0"+(dt.getMonth()+1)).slice(-2)+"-"+("0"+dt.getDate()).slice(-2);
+var lb=dt.toLocaleDateString("it-IT",{weekday:"short",day:"numeric"});
+if(!days[k])days[k]={t:[],h:[],rain:0,w:[],lb:lb,k:k};
+if(d.tempf!=null)days[k].t.push(parseFloat(fc(d.tempf)));
+if(d.humidity!=null)days[k].h.push(d.humidity);
+if(d.dailyrainin!=null)days[k].rain=Math.max(days[k].rain,parseFloat(im(d.dailyrainin)));
+if(d.windspeedmph!=null)days[k].w.push(parseFloat(mk(d.windspeedmph)))}
+var ks=Object.keys(days).sort(),res=[];
+for(var j=0;j<ks.length;j++){var dd2=days[ks[j]];
+var at=dd2.t.length?dd2.t.reduce(function(a,b){return a+b},0)/dd2.t.length:0;
+res.push({lb:dd2.lb,mn:dd2.t.length?Math.min.apply(null,dd2.t):0,mx:dd2.t.length?Math.max.apply(null,dd2.t):0,av:parseFloat(at.toFixed(1)),
+hu:dd2.h.length?Math.round(dd2.h.reduce(function(a,b){return a+b},0)/dd2.h.length):0,ra:dd2.rain,
+wi:dd2.w.length?parseFloat((dd2.w.reduce(function(a,b){return a+b},0)/dd2.w.length).toFixed(1)):0})}
+return res}
+
+function d7(){
+if(typeof Chart==="undefined"||!S.d7d)return;
+for(var k in S.ci){try{S.ci[k].destroy()}catch(e){}}S.ci={};
+document.getElementById("L7").style.display="none";document.getElementById("W7").style.display="block";
+var ds=S.d7d,lb=ds.map(function(d){return d.lb});
+var lo={responsive:true,maintainAspectRatio:false,elements:{point:{radius:3},line:{tension:.3}},plugins:{legend:{display:true,labels:{color:"#778899"}},tooltip:{mode:"index",intersect:false}}};
+var bo={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
+S.ci.f=new Chart(nC("g6"),{type:"line",data:{labels:lb,datasets:[
+{data:ds.map(function(d){return d.mx}),borderColor:"#cc3322",borderWidth:2,label:"Max",fill:false},
+{data:ds.map(function(d){return d.av}),borderColor:"#cc7a18",borderWidth:1,borderDash:[4,2],label:"Media",fill:false},
+{data:ds.map(function(d){return d.mn}),borderColor:"#1a7abc",borderWidth:2,label:"Min",fill:false}]},options:lo});
+S.ci.g=new Chart(nC("g7"),{type:"bar",data:{labels:lb,datasets:[{data:ds.map(function(d){return d.ra}),backgroundColor:"#3088cc",borderRadius:3}]},options:bo});
+S.ci.h=new Chart(nC("g8"),{type:"line",data:{labels:lb,datasets:[{data:ds.map(function(d){return d.hu}),borderColor:"#1a7abc",borderWidth:2,fill:false,tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100}},plugins:{legend:{display:false}}}});
+S.ci.i=new Chart(nC("g9"),{type:"bar",data:{labels:lb,datasets:[{data:ds.map(function(d){return d.wi}),backgroundColor:"#2a8a4a",borderRadius:3}]},options:bo})}
+
+document.getElementById("bG").onclick=doC;
+document.getElementById("bR").onclick=doR;
+document.getElementById("bO").onclick=function(){try{localStorage.removeItem("wa");localStorage.removeItem("wb")}catch(e){}location.reload()};
+document.getElementById("iB").onkeydown=function(e){if(e.key==="Enter")doC()};
+var nb=document.querySelectorAll(".nav button");
+for(var i=0;i<nb.length;i++)nb[i].onclick=(function(x){return function(){gT(x)}})(i);
+
+var xa=CK,xb=AK;
+if(!xa){try{xa=localStorage.getItem("wa");xb=localStorage.getItem("wb")}catch(e){}}
+if(xa&&xb){document.getElementById("iA").value=xa;document.getElementById("iB").value=xb;doC()}
+</script>
+</body>
+</html>
